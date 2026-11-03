@@ -11,6 +11,12 @@ WORKDIR /maddy
 COPY go.mod go.sum ./
 RUN go mod download
 
+# Fix: SEARCH SINCE/ON excluding messages from the given day (RFC 3501 6.4.4)
+RUN f=$(find "$(go env GOMODCACHE)/github.com/foxcpp" -path '*go-imap@*/backend/backendutil/search.go') && \
+    chmod u+w "$f" && \
+    sed -i 's/!c.Since.IsZero() \&\& !date.After(c.Since)/!c.Since.IsZero() \&\& date.Before(c.Since)/' "$f" && \
+    grep -q 'date.Before(c.Since)' "$f"
+
 COPY . ./
 RUN mkdir -p /pkg/data && \
     cp maddy.conf.docker /pkg/data/maddy.conf && \
