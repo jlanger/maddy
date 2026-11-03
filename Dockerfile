@@ -15,7 +15,7 @@ RUN go mod download
 RUN f=$(find "$(go env GOMODCACHE)/github.com/foxcpp" -path '*go-imap@*/backend/backendutil/search.go') && \
     chmod u+w "$f" && \
     sed -i 's/!c.Since.IsZero() \&\& !date.After(c.Since)/!c.Since.IsZero() \&\& date.Before(c.Since)/' "$f" && \
-    grep -q 'date.Before(c.Since)' "$f"
+    grep -n 'date.Before(c.Since)' "$f"
 
 COPY . ./
 RUN mkdir -p /pkg/data && \
